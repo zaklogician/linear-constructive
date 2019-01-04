@@ -65,6 +65,9 @@ p ⊸ q = (~ p) ⅋ q
 ⟦ lprop φ₊ _ _ ⟧ = φ₊ 
 
 
+_⊢_ : LProp → LProp → Set
+Γ ⊢ P = ⟦ Γ ⊸ P ⟧
+
 ----------
 -- Here we prove that these connectives satisfy Hesselink's axioms and rules
 -- for the multiplicative fragment of linear logic. See also:
@@ -113,6 +116,21 @@ mp-rule-ctx
     (λ x → proj₁ a (proj₁ ab x)) ,
     (λ x → proj₂ ab (proj₂ a x))
 
+-- A deduction-like variant of the same result.
+deduction : (Γ P Q : LProp) → (Γ ⅋ P) ⊢ Q → Γ ⊢ (P ⊸ Q)
+deduction
+  (lprop γ₊ γ₋ _)
+  (lprop φ₊ φ₋ _)
+  (lprop ψ₊ ψ₋ _) gpq =
+    (λ pq → helper1 (proj₂ pq)) ,
+    (λ g → helper2 ,
+    (λ p → helper3 (λ _ → g) (λ _ → p))) where
+      helper1 : ψ₋ → γ₋
+      helper1 x = proj₁ (proj₁ gpq x)
+      helper2 : ψ₋ → φ₋
+      helper2 x = proj₂ (proj₁ gpq x)
+      helper3 : (φ₋ → γ₊) → (γ₋ → φ₊) → ψ₊
+      helper3 x y = proj₂ gpq (x , y)
 
 ----------
 -- Here we prove the involutive property of negation.
@@ -121,3 +139,53 @@ open import Relation.Binary.PropositionalEquality
 
 theorem : (P : LProp) → ~ (~ P) ≡ P
 theorem (lprop φ₊ φ₋ x) = refl
+
+
+-- 2. PROPOSITIONAL-EXPONENTIAL FRAGMENT
+
+-- The "of course!" modality
+! : LProp → LProp
+! (lprop φ₊ φ₋ _) = lprop φ₊ (φ₊ → ⊥) λ z → z
+
+-- The "why not?" modality
+⁇ : LProp → LProp
+⁇ (lprop φ₊ φ₋ _) = lprop (φ₋ → ⊥) φ₋ λ x y → y x
+
+----------
+-- Here we verify that the H-CLL axioms hold for the modalities.
+
+-- A weakening axiom
+axiom-1! : (P Q : LProp) → ⟦ P ⊸ (! Q ⊸ P) ⟧
+axiom-1!
+  (lprop φ₊ φ₋ p)
+  (lprop ψ₊ ψ₋ q) =
+    proj₂ ,
+    λ y → (λ x _ → p x y) , (λ _ → y)
+
+axiom-2! : (P Q : LProp) → ⟦ ! (P ⊸ Q) ⊸ (! P ⊸ ! Q) ⟧
+axiom-2!
+  (lprop φ₊ φ₋ p)
+  (lprop ψ₊ ψ₋ q) =
+    (λ x y → proj₂ x (proj₂ y (proj₁ x))) ,
+    (λ x → (λ y z → y (proj₂ x z)) , proj₂ x)
+
+axiom-3! : (P : LProp) → ⟦ ! P ⊸ P ⟧
+axiom-3! (lprop φ₊ φ₋ p) = p , (λ x → x)
+
+axiom-4! : (P : LProp) → ⟦ ! P ⊸ ! (! P) ⟧
+axiom-4! (lprop φ₊ φ₋ p) = (λ x → x) , (λ x → x)
+
+-- A contraction axiom
+axiom-5! : (P Q : LProp) → ⟦ (! P ⊸ (! P ⊸ Q)) ⊸ (! P ⊸ Q) ⟧
+axiom-5!
+  (lprop φ₊ φ₋ p)
+  (lprop ψ₊ ψ₋ q) =
+  (λ pq → proj₁ pq , proj₁ pq , proj₂ pq) ,
+  (λ x → (λ y z → proj₁ x (z , y) z) ,
+  (λ y → proj₂ (proj₂ x y) y))
+
+-- Fortunately, the modal inference rule is trivially verified.
+
+modal-rule : (P : LProp) → ⟦ P ⟧ → ⟦ ! P ⟧
+modal-rule (lprop φ₊ φ₋ p) x = x
+
