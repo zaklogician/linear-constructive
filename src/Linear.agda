@@ -71,7 +71,7 @@ _⊢_ : LProp → LProp → Set
 ----------
 -- Here we prove that these connectives satisfy Hesselink's axioms and rules
 -- for the multiplicative fragment of linear logic. See also:
--- W. H. Hesselink: Axioms and models of linear logic, in Formal Aspects of Computing, 1990)
+-- W. H. Hesselink: Axioms and models of linear logic, in Formal Aspects of Computing, 1990
 
 
 -- Identity axiom.
@@ -100,13 +100,6 @@ axiom-3
     (λ z → proj₂ x (y , z))))
 
 
--- Duality between ⊕ and &.
-axiom-4 : (P Q : LProp) → ⟦ ~(P ⊕ Q) ⊸ (~ P & ~ Q) ⟧
-axiom-4
-  (lprop φ₊ φ₋ p)
-  (lprop ψ₊ ψ₋ q) = (λ x → x) , (λ x → x)
-
-
 -- Finally, the analogues of the rules of inferece work as expected.
 mp-rule : (P Q : LProp) → ⟦ P ⟧ → ⟦ P ⊸ Q ⟧ → ⟦ Q ⟧
 mp-rule
@@ -122,6 +115,7 @@ mp-rule-ctx
   (lprop ψ₊ ψ₋ q) a ab =
     (λ x → proj₁ a (proj₁ ab x)) ,
     (λ x → proj₂ ab (proj₂ a x))
+
 
 -- A deduction-like variant of the same result.
 deduction : (Γ P Q : LProp) → (Γ ⅋ P) ⊢ Q → Γ ⊢ (P ⊸ Q)
@@ -140,12 +134,33 @@ deduction
       helper3 x y = proj₂ gpq (x , y)
 
 ----------
--- Here we prove the involutive property of negation.
+-- We verify the usual dualities, along with the involutive property of negation.
+
+tensor-par-duality : (P Q : LProp) → ⟦ (~ (P ⊗ Q)) ⊸ ((~ P) ⅋ (~ Q)) ⟧
+tensor-par-duality
+  (lprop φ₊ φ₋ x)
+  (lprop ψ₊ ψ₋ y) = (λ z → z) , λ z → proj₂ z , proj₁ z
+
+par-tensor-duality : (P Q : LProp) → ⟦ ~ (P ⅋ Q) ⊸ (~ P ⊗ ~ Q) ⟧
+par-tensor-duality
+  (lprop φ₊ φ₋ x)
+  (lprop ψ₊ ψ₋ y) = (λ z → proj₂ z , proj₁ z) , λ z → z
+
+plus-with-duality : (P Q : LProp) → ⟦ ~ (P ⊕ Q) ⊸ (~ P & ~ Q) ⟧
+plus-with-duality
+  (lprop φ₊ φ₋ p)
+  (lprop ψ₊ ψ₋ q) = (λ z → z) , λ z → z
+
+with-plus-duality : (P Q : LProp) → ⟦ ~ (P & Q) ⊸ (~ P ⊕ ~ Q) ⟧
+with-plus-duality
+  (lprop φ₊ φ₋ x)
+  (lprop ψ₊ ψ₋ y) = (λ z → z) , λ z → z
+
 
 open import Relation.Binary.PropositionalEquality
-
-theorem : (P : LProp) → ~ (~ P) ≡ P
-theorem (lprop φ₊ φ₋ x) = refl
+-- The involutive property holds up to equality.
+involutive-negation : (P : LProp) → ~ (~ P) ≡ P
+involutive-negation (lprop φ₊ φ₋ x) = refl
 
 
 -- 2. PROPOSITIONAL-EXPONENTIAL FRAGMENT
