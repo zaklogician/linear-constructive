@@ -36,10 +36,10 @@ _&_ : LProp → LProp → LProp
 -- Additive disjunction: notice the symmetry between the proofs `pq` between
 -- additive conjunctions and additive disjunctions.
 _⊕_ : LProp → LProp → LProp
-(lprop φ₊ φ₋ p) ⊕ (lprop ψ₊ ψ₋ q) = lprop (φ₋ ⊎ ψ₋) (φ₊ × ψ₊) pq where
-  pq : (φ₊ × ψ₊) → (φ₋ ⊎ ψ₋) → ⊥
-  pq (a , b) (inj₁ ~a) = p ~a a
-  pq (a , b) (inj₂ ~b) = q ~b b
+(lprop φ₊ φ₋ p) ⊕ (lprop ψ₊ ψ₋ q) = lprop (φ₊ ⊎ ψ₊) (φ₋ × ψ₋) pq where
+  pq : (φ₋ × ψ₋) → (φ₊ ⊎ ψ₊) → ⊥
+  pq (~a , ~b) (inj₁ a) = p ~a a
+  pq (~a , ~b) (inj₂ b) = q ~b b
 
 
 -- Multiplicative conjunction
@@ -98,6 +98,13 @@ axiom-3
     (λ x → (λ y → proj₁ (proj₁ x (proj₂ y)) (proj₁ y)) ,
     (λ y → (λ (z : ρ₋) → proj₂ (proj₁ x z) y) ,
     (λ z → proj₂ x (y , z))))
+
+
+-- Duality between ⊕ and &.
+axiom-4 : (P Q : LProp) → ⟦ ~(P ⊕ Q) ⊸ (~ P & ~ Q) ⟧
+axiom-4
+  (lprop φ₊ φ₋ p)
+  (lprop ψ₊ ψ₋ q) = (λ x → x) , (λ x → x)
 
 
 -- Finally, the analogues of the rules of inferece work as expected.
