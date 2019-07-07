@@ -24,6 +24,7 @@ disjunction and equality manually.
 4. Push to the branch: `git push origin my-new-feature`
 5. Submit a pull request.
 
-## Authors
+## Authors and Contributors
 
 * **Zoltan A. Kocsis** - University of Manchester
+* [Shimin Guo](https://github.com/guoshimin)
